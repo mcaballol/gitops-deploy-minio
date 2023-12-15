@@ -1,0 +1,51 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  generation: 1
+  name: minio
+  namespace: openshift-gitops
+spec:
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  destinations:
+    - namespace: '*'
+      server: '*'
+  sourceRepos:
+    - '*'
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  name: minio
+  namespace: openshift-gitops
+spec:
+  destination:
+    name: ''
+    namespace: minio
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: overlays/poc
+# we specify the folder for the files
+    repoURL: 'https://github.com/mcaballol/gitops-deploy-minio.git'
+# the repository url
+    targetRevision: main
+# and branch, in this case HEAD / main 
+  project: minio
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: false
+    retry:
+      limit: 10
+    managedNamespaceMetadata:
+      labels:
+        argocd.argoproj.io/managed-by: openshift-gitops
+      # annotations:
+      #   argocd.argoproj.io/sync-wave: "0"
+
+    syncOptions:
+    - CreateNamespace=true

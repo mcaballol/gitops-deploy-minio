@@ -1,0 +1,82 @@
+﻿kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  annotations:
+    app.openshift.io/route-disabled: 'false'
+    openshift.io/generated-by: OpenShiftWebConsole
+  name: minio
+  generation: 8
+
+  labels:
+    app: minio
+    app.kubernetes.io/component: minio
+    app.kubernetes.io/instance: minio
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/part-of: minio-app
+    app.openshift.io/runtime-namespace: s3-test
+spec:
+  strategy:
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 600
+      maxUnavailable: 25%
+      maxSurge: 25%
+    resources: {}
+    activeDeadlineSeconds: 21600
+  triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - minio
+        from:
+          kind: ImageStreamTag
+          name: 'minio:latest'
+        lastTriggeredImage: >-
+          image-registry.openshift-image-registry.svc:5000/s3-test/minio@sha256:c546e1398fe5c4959f759c297120d9cd4da57f9533739c2e1089c14a776b10cd
+    - type: ConfigChange
+  replicas: 1
+  revisionHistoryLimit: 10
+  test: false
+  selector:
+    app: minio
+    deploymentconfig: minio
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: minio
+        deploymentconfig: minio
+      annotations:
+        openshift.io/generated-by: OpenShiftWebConsole
+    spec:
+      volumes:
+        - name: minio
+          persistentVolumeClaim:
+            claimName: minio
+      containers:
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          name: minio
+          command:
+            - /bin/bash
+            - '-c'
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: minio
+              mountPath: /data
+          terminationMessagePolicy: File
+          image: >-
+            image-registry.openshift-image-registry.svc:5000/minio/minio@sha256:c546e1398fe5c4959f759c297120d9cd4da57f9533739c2e1089c14a776b10cd
+          args:
+            - 'minio server /data --console-address :9090'
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
