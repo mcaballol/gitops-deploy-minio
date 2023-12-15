@@ -81,4 +81,5 @@ spec:
       securityContext: {}
       schedulerName: default-scheduler
 #TODO 
+#https://min.io/docs/minio/linux/reference/minio-server/settings/root-credentials.html#envvar.MINIO_ROOT_PASSWORD
 # definir MINIO_ROOT_USER y  MINIO_ROOT_PASSWORD  default minioadmin
