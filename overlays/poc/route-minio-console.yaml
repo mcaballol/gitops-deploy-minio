@@ -21,5 +21,5 @@ spec:
     targetPort: 9090-tcp
   tls:
     termination: edge
-    insecureEdgeTerminationPolicy: Redirect
+    insecureEdgeTerminationPolicy: Allow
   wildcardPolicy: None
