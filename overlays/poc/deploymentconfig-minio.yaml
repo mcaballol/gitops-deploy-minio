@@ -80,3 +80,5 @@ spec:
       dnsPolicy: ClusterFirst
       securityContext: {}
       schedulerName: default-scheduler
+#TODO 
+# definir MINIO_ROOT_USER y  MINIO_ROOT_PASSWORD  default minioadmin
